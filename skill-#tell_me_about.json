@@ -1,0 +1,317 @@
+{
+  "intents": [
+    {
+      "intent": "tell_me_about",
+      "examples": [
+        {
+          "text": "Can you explain something about the International Space Station",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                36,
+                63
+              ]
+            }
+          ]
+        },
+        {
+          "text": "give me the definition of literature",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                26,
+                36
+              ]
+            }
+          ]
+        },
+        {
+          "text": "Please define gravity",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                14,
+                21
+              ]
+            }
+          ]
+        },
+        {
+          "text": "Tell me something about Star Wars",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                24,
+                33
+              ]
+            }
+          ]
+        },
+        {
+          "text": "what is love",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                8,
+                12
+              ]
+            }
+          ]
+        },
+        {
+          "text": "tell me about Barack Obama",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                14,
+                26
+              ]
+            }
+          ]
+        },
+        {
+          "text": "tell me about Donald Trump",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                14,
+                26
+              ]
+            }
+          ]
+        },
+        {
+          "text": "explain to me what bitcoin is",
+          "mentions": [
+            {
+              "entity": "object_of_interest",
+              "location": [
+                19,
+                26
+              ]
+            }
+          ]
+        }
+      ],
+      "description": ""
+    }
+  ],
+  "entities": [
+    {
+      "entity": "object_of_interest",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "International Space Station",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "literature",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "gravity",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "Star Wars",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "love",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "Barack Obama",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "Donald Trump",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "bitcoin",
+          "synonyms": []
+        }
+      ],
+      "fuzzy_match": true
+    }
+  ],
+  "metadata": {
+    "api_version": {
+      "major_version": "v2",
+      "minor_version": "2018-11-08"
+    }
+  },
+  "webhooks": [
+    {
+      "url": "https://us-south.functions.cloud.ibm.com/api/v1/web/parker.merritt%40ibm.com_dev/Assistant-Functions/Wikipedia-Connection.json",
+      "name": "main_webhook",
+      "headers": []
+    }
+  ],
+  "dialog_nodes": [
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "I am defining @object_of_interest : <? $webhook_result_1.extract.extract ?>"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_2_1587052556128",
+      "conditions": "$webhook_result_1.extract.type==”standard”",
+      "dialog_node": "response_5_1587052863355",
+      "previous_sibling": "response_7_1587052595486"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "I am not quite sure about the term @object_of_interest . Please try another topic."
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_2_1587052556128",
+      "conditions": "anything_else",
+      "dialog_node": "response_2_1587052596289",
+      "previous_sibling": "response_5_1587052863355"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "I am defining @object_of_interest : <? $webhook_result_1.extract.extract ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          },
+          {
+            "title": "$webhook_result_1.extract.title",
+            "source": "$webhook_result_1.extract.thumbnail.source",
+            "description": "$webhook_result_1.extract.description",
+            "response_type": "image"
+          }
+        ]
+      },
+      "parent": "node_2_1587052556128",
+      "conditions": "$webhook_result_1.extract.thumbnail",
+      "dialog_node": "response_7_1587052595486"
+    },
+    {
+      "type": "standard",
+      "title": "Anything else",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "I didn't understand. You can try rephrasing."
+              },
+              {
+                "text": "Can you reword your statement? I'm not understanding."
+              },
+              {
+                "text": "I didn't get your meaning."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "anything_else",
+      "dialog_node": "Anything else",
+      "previous_sibling": "node_2_1587052556128",
+      "disambiguation_opt_out": true
+    },
+    {
+      "type": "standard",
+      "title": "Define",
+      "actions": [
+        {
+          "name": "main_webhook",
+          "type": "webhook",
+          "parameters": {
+            "object_of_interest": "@object_of_interest"
+          },
+          "result_variable": "webhook_result_1"
+        }
+      ],
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "conditions": "#tell_me_about && @object_of_interest",
+      "dialog_node": "node_2_1587052556128",
+      "previous_sibling": "Welcome"
+    },
+    {
+      "type": "standard",
+      "title": "Welcome",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Hello! I'm the Wikipedia AI assistant. I can help you learn about almost anything you can find on Wikipedia. What would you like to look up?"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "welcome",
+      "dialog_node": "Welcome"
+    }
+  ],
+  "counterexamples": [],
+  "system_settings": {
+    "off_topic": {
+      "enabled": true
+    },
+    "disambiguation": {
+      "prompt": "Did you mean:",
+      "enabled": true,
+      "randomize": true,
+      "max_suggestions": 5,
+      "suggestion_text_policy": "title",
+      "none_of_the_above_prompt": "None of the above"
+    },
+    "system_entities": {
+      "enabled": true
+    },
+    "human_agent_assist": {
+      "prompt": "Did you mean:"
+    },
+    "spelling_auto_correct": true
+  },
+  "learning_opt_out": false,
+  "name": "#tell_me_about",
+  "language": "en",
+  "description": ""
+}
